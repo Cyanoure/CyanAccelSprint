@@ -1,0 +1,10 @@
+name: CyanAccelSprint
+version: 1.0
+author: Cyanoure
+main: ga.cyanoure.cyanaccelsprint.Main
+website: http://www.cyanoure.ga/
+description: Gyorsulo Sprint Rendszer
+commands:
+    casreload:
+        description: Config ujratoltese
+        permission: cyanaccelsprint.admin

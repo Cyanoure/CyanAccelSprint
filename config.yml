@@ -1,0 +1,7 @@
+prefix: "&8[&3CyanAccelSprint&8] "
+sprint: # delay:speedlevel
+    1: 1
+    2: 2
+    3: 4
+    4: 8
+    5: 16
