@@ -1,19 +1,20 @@
 package ga.cyanoure.cyanaccelsprint;
 
-import org.bukkit.Bukkit;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+
 public class UpdateChecker {
 
-    private Main plugin;
+    private JavaPlugin plugin;
     private int resourceId;
 
-    public UpdateChecker(Main plugin, int resourceId) {
+    public UpdateChecker(JavaPlugin plugin, int resourceId) {
         this.plugin  = plugin;
         this.resourceId = resourceId;
     }
