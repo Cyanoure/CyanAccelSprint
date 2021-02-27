@@ -1,10 +1,10 @@
 name: CyanAccelSprint
-version: 1.1
-author: Cyanoure
+version: @version@
 main: ga.cyanoure.cyanaccelsprint.Main
+author: Cyanoure
 website: http://www.cyanoure.ga/
 description: Sprint Accelerator Plugin
 commands:
-    casreload:
-        description: Reload config
-        permission: cyanaccelsprint.admin
+  casreload:
+    description: Reload config
+    permission: cyanaccelsprint.admin

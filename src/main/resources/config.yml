@@ -1,0 +1,12 @@
+prefix: "&8[&3CyanAccelSprint&8] "
+sprint-permission: null # null -> no permission required for sprint acceleration
+world-list-type: default # values: blacklist (default), whitelist
+world-list:
+    - any_world_to_blacklist
+    - example_world
+sprint: # delay:speedlevel
+    1: 1
+    2: 2
+    3: 4
+    4: 8
+    5: 16

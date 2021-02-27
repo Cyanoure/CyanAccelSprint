@@ -34,7 +34,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 		String prefix = this.config.getString("prefix");
 		getServer().getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',prefix+msg));
 	}
-	
+
 	private void LoadConfig() {
 		this.saveDefaultConfig();
 		//this.getConfig().addDefault("", "");
@@ -72,14 +72,14 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 	public void onSprint(PlayerToggleSprintEvent event) {
 		Player p = event.getPlayer();
 		
-		// Az ellenõrzés fordítva mûködik, mert ha nem sprintelt, akkor sprintelni fog, ha sprintel, akkor nem fog.
+		// Az ellenï¿½rzï¿½s fordï¿½tva mï¿½kï¿½dik, mert ha nem sprintelt, akkor sprintelni fog, ha sprintel, akkor nem fog.
 		if(!p.isSprinting()) {
 			SprintUser newItem = new SprintUser();
 			newItem.Player = p;
 			newItem.SprintSince = System.currentTimeMillis();
 			for(int i = 0; i < SprintList.size(); i++) {
 				if(SprintList.get(i).Player.getName() == p.getName()) {
-					pluginMessage("&cSprint beragadás hiba kiküszöbölve: A játékos már a listában van, ezért nem lett újra hozzáadva.");
+					pluginMessage("&cSprint beragadï¿½s hiba kikï¿½szï¿½bï¿½lve: A jï¿½tï¿½kos mï¿½r a listï¿½ban van, ezï¿½rt nem lett ï¿½jra hozzï¿½adva.");
 					return;
 				}
 			}
@@ -99,7 +99,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 	public void onQuit(PlayerQuitEvent e) {
 		Player p = e.getPlayer();
 		for(int i = 0; i < SprintList.size(); i++) {
-			if(SprintList.get(i).Player.getName() == p.getName()) {
+			if(SprintList.get(i).Player.getName().equals(p.getName())) {
 				SprintList.remove(i);
 				p.removePotionEffect(PotionEffectType.SPEED);
 				break;
@@ -111,37 +111,43 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 	public void onMove(PlayerMoveEvent e) {
 		Player p = e.getPlayer();
 		if(p.isSprinting() && !isInList(p)) {
-			addToList(p);
+			if(config.getString("sprint-permission") == null || p.hasPermission(config.getString("sprint-permission"))) {
+				if(config.getStringList("world-list").contains(p.getWorld().getName()) == (config.getString("world-list-type").equals("whitelist"))) {
+					addToList(p);
+				}
+			}
 		}else if(!p.isSprinting() && isInList(p)) {
 			removeFromList(p);
 			p.removePotionEffect(PotionEffectType.SPEED);
 		}
 		if(p.isSprinting()) {
-			for(int i = 0; i < SprintList.size(); i++) {
-				if(SprintList.get(i).Player.getName() == p.getName()) {
-					double SprintSince = SprintList.get(i).SprintSince;
-					double TimeNow = System.currentTimeMillis();
-					int ElteltIdo = (int) ((TimeNow - SprintSince)/1000);
-					int speedLevel = 0;
-					Object[] SprintDurations = this.config.getConfigurationSection("sprint").getKeys(false).toArray();
-					for(int j = 0; j < SprintDurations.length; j++) {
-						int ido = Integer.parseInt(SprintDurations[j].toString());
-						if(ElteltIdo >= ido) {
-							speedLevel = this.config.getInt("sprint."+String.valueOf(ido));
+			if(isInList(p)) {
+				for (int i = 0; i < SprintList.size(); i++) {
+					if (SprintList.get(i).Player.getName().equals(p.getName())) {
+						double SprintSince = SprintList.get(i).SprintSince;
+						double TimeNow = System.currentTimeMillis();
+						int ElteltIdo = (int) ((TimeNow - SprintSince) / 1000);
+						int speedLevel = 0;
+						Object[] SprintDurations = this.config.getConfigurationSection("sprint").getKeys(false).toArray();
+						for (int j = 0; j < SprintDurations.length; j++) {
+							int ido = Integer.parseInt(SprintDurations[j].toString());
+							if (ElteltIdo >= ido) {
+								speedLevel = this.config.getInt("sprint." + String.valueOf(ido));
+							}
 						}
+						if (speedLevel > 0 && SprintList.get(i).PotionStrength != speedLevel) {
+							p.removePotionEffect(PotionEffectType.SPEED);
+							p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 1000000, speedLevel));
+						}
+						SprintList.get(i).PotionStrength = speedLevel;
+						break;
 					}
-					if(speedLevel > 0 && SprintList.get(i).PotionStrength != speedLevel) {
-						p.removePotionEffect(PotionEffectType.SPEED);
-						p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,1000000,speedLevel));
-					}
-					SprintList.get(i).PotionStrength = speedLevel;
-					break;
 				}
 			}
 		}
 	}
 	
-	@EventHandler
+	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(sender instanceof Player) {
 			Player p = (Player)sender;
