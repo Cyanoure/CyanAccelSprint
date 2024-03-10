@@ -1,5 +1,5 @@
 name: CyanAccelSprint
-version: @version@
+version: ${version}
 main: ga.cyanoure.cyanaccelsprint.Main
 author: Cyanoure
 website: http://www.cyanoure.ga/

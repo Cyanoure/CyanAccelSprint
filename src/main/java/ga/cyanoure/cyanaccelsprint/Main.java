@@ -3,6 +3,7 @@ package ga.cyanoure.cyanaccelsprint;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,6 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class Main extends JavaPlugin implements Listener, CommandExecutor{
 	public FileConfiguration config;
+	public static int metricsPluginId = 21296;
 	
 	class SprintUser {
 		public Player Player;
@@ -49,6 +51,12 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 	
 	@Override
 	public void onEnable() {
+		try {
+			new Metrics(this, Main.metricsPluginId);
+		} catch (Exception e) {
+			// Failed to connect to bStats server or something else went wrong.
+		}
+
 		LoadConfig();
 		SprintList = new ArrayList<SprintUser>();
 		getServer().getPluginManager().registerEvents(this, this);
@@ -60,7 +68,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 			pluginMessage("Current version: "+this.getDescription().getVersion());
 			pluginMessage("Latest version on spigotmc.org: "+version);
 			pluginMessage("You can download the latest version at https://www.spigotmc.org/resources/cyanaccelsprint.79042/");
-		});;
+		});
 	}
 	
 	@Override
