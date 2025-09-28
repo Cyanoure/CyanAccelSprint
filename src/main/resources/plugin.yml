@@ -1,8 +1,8 @@
 name: CyanAccelSprint
 version: @version@
-main: ga.cyanoure.cyanaccelsprint.Main
+main: hu.kozelkaricsi.cyanaccelsprint.Main
 author: Cyanoure
-website: http://www.cyanoure.ga/
+website: https://kozelkaricsi.hu/
 description: Sprint Accelerator Plugin
 commands:
   casreload:

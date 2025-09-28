@@ -1,6 +1,6 @@
-package ga.cyanoure.cyanaccelsprint.commands;
+package hu.kozelkaricsi.cyanaccelsprint.commands;
 
-import ga.cyanoure.cyanaccelsprint.Main;
+import hu.kozelkaricsi.cyanaccelsprint.Main;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

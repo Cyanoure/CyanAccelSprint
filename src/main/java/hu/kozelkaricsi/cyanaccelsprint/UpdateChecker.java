@@ -1,4 +1,4 @@
-package ga.cyanoure.cyanaccelsprint;
+package hu.kozelkaricsi.cyanaccelsprint;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,13 +1,11 @@
-package ga.cyanoure.cyanaccelsprint;
+package hu.kozelkaricsi.cyanaccelsprint;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ga.cyanoure.cyanaccelsprint.commands.ReloadCommand;
-import ga.cyanoure.cyanaccelsprint.commands.ToggleCommand;
+import hu.kozelkaricsi.cyanaccelsprint.commands.ReloadCommand;
+import hu.kozelkaricsi.cyanaccelsprint.commands.ToggleCommand;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;

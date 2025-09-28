@@ -1,4 +1,4 @@
-package ga.cyanoure.cyanaccelsprint;
+package hu.kozelkaricsi.cyanaccelsprint;
 
 import java.sql.*;
 import java.util.UUID;
