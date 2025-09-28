@@ -3,6 +3,8 @@ package ga.cyanoure.cyanaccelsprint;
 import java.util.ArrayList;
 import java.util.List;
 
+import ga.cyanoure.cyanaccelsprint.commands.ReloadCommand;
+import ga.cyanoure.cyanaccelsprint.commands.ToggleCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,12 +18,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.metadata.FixedMetadataValue;
 
 
-public class Main extends JavaPlugin implements Listener, CommandExecutor{
+public class Main extends JavaPlugin implements Listener {
 	public FileConfiguration config;
 	
 	private static final int POTION_DURATION = 1000000;
+    private static DatabaseHandler dbHandler;
 
 	private class SprintUser {
 		public Player player;
@@ -33,6 +37,51 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 			this.sprintSince = sprintSince;
 		}
 	}
+
+    public void sendTranslation(Player p, String path, String defaultValue) {
+        p.sendMessage(ChatColor.translateAlternateColorCodes('&',this.config.getString("prefix", "[CAS] ") + this.config.getString(path,defaultValue)));
+    }
+
+    public void sendTranslation(CommandSender sender, String path, String defaultValue) {
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&',this.config.getString("prefix", "[CAS] ") + this.config.getString(path,defaultValue)));
+    }
+
+    public void enableSprint(Player p) {
+        p.setMetadata("sprint_acceleration_enabled", new FixedMetadataValue(this, true));
+        sendTranslation(p, "message-sprint-enabled", "&eEnabled sprint acceleration.");
+        dbHandler.setPlayerSprintState(p.getUniqueId(), true);
+    }
+
+    public void disableSprint(Player p) {
+        p.setMetadata("sprint_acceleration_enabled", new FixedMetadataValue(this, false));
+        sendTranslation(p, "message-sprint-enabled", "&eDisabled sprint acceleration.");
+        dbHandler.setPlayerSprintState(p.getUniqueId(), false);
+    }
+
+    public boolean isSprintEnabled(Player p) {
+        if (!p.hasMetadata("sprint_acceleration_enabled")) {
+            boolean storedOrDefaultAccel = dbHandler.getPlayerSprintState(p.getUniqueId());
+            p.setMetadata("sprint_acceleration_enabled", new FixedMetadataValue(this, storedOrDefaultAccel));
+            dbHandler.updatePlayerTimestamp(p.getUniqueId());
+            return storedOrDefaultAccel;
+        }
+        return p.getMetadata("sprint_acceleration_enabled").get(0).asBoolean();
+    }
+
+    /**
+     * Toggles sprint acceleration
+     * @param p Player
+     * @return Returns the new state. True if it's now enabled, false if disabled.
+     */
+    public boolean toggleSprint(Player p) {
+        if (isSprintEnabled(p)) {
+            disableSprint(p);
+            return false;
+        }
+
+        enableSprint(p);
+        return true;
+    }
 
 	private List<SprintUser> sprintList;
 	
@@ -50,8 +99,10 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 	public void onEnable() {
 		LoadConfig();
 		sprintList = new ArrayList<>();
+        dbHandler = new DatabaseHandler(this);
 		getServer().getPluginManager().registerEvents(this, this);
-		this.getCommand("casreload").setExecutor(this);
+        this.getCommand("casreload").setExecutor(new ReloadCommand(this));
+        this.getCommand("togglesprint").setExecutor(new ToggleCommand(this));
 		
 		pluginMessage("&2Plugin and configuration loaded.");
 		
@@ -77,7 +128,8 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 	@EventHandler
 	public void onMove(PlayerMoveEvent e) {
 		Player p = e.getPlayer();
-		if(p.isSprinting() && !isInList(p)) {
+        boolean isSprintAccelerationEnabled = isSprintEnabled(p);
+		if (p.isSprinting() && !isInList(p) && isSprintAccelerationEnabled) {
 			String sprintPermission = config.getString("sprint-permission");
 			if (sprintPermission == null || p.hasPermission(sprintPermission)) {
 				String worldListType = config.getString("world-list-type", "whitelist");
@@ -86,11 +138,12 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 					addToList(p);
 				}
 			}
-		}else if(!p.isSprinting() && isInList(p)) {
+		} else if((!p.isSprinting() || !isSprintAccelerationEnabled) && isInList(p)) {
 			removeFromList(p);
 			p.removePotionEffect(PotionEffectType.SPEED);
+			p.setMetadata("sprint_acceleration_speedlevel", new FixedMetadataValue(this, 0));
 		}
-		if(p.isSprinting()) {
+		if (p.isSprinting()) {
 			if(isInList(p)) {
 				for (SprintUser user : sprintList) {
 					if (user.player.getUniqueId().equals(p.getUniqueId())) {
@@ -110,29 +163,13 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor{
 							p.removePotionEffect(PotionEffectType.SPEED);
 							p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, POTION_DURATION, speedLevel));
 						}
+						p.setMetadata("sprint_acceleration_speedlevel", new FixedMetadataValue(this, speedLevel));
 						user.potionStrength = speedLevel;
 						break;
 					}
 				}
 			}
 		}
-	}
-	
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(sender instanceof Player) {
-			Player p = (Player)sender;
-			if(!p.hasPermission("cyanaccelsprint.admin")) {
-				p.sendMessage(ChatColor.translateAlternateColorCodes('&',this.config.getString("prefix", "[CAS] ") + "&cYou don't have permission for that!"));
-				return true;
-			}
-		}
-		
-		this.reloadConfig();
-		this.config = this.getConfig();
-		sender.sendMessage(ChatColor.translateAlternateColorCodes('&',this.config.getString("prefix", "[CAS] ") + "&2Configuration reloaded."));
-		
-		return true;
 	}
 	
 	private boolean isInList(Player p) {

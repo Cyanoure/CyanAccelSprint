@@ -8,3 +8,6 @@ commands:
   casreload:
     description: Reload config
     permission: cyanaccelsprint.admin
+  togglesprint:
+    description: Toggle sprint acceleration
+    permission: cyanaccelsprint.toggle

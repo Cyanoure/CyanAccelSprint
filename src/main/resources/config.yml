@@ -1,9 +1,12 @@
 prefix: "&8[&3CyanAccelSprint&8] "
+message-sprint-disabled: "&eSprint gyorsítás kikapcsolva."
+message-sprint-enabled: "&eSprint gyorsítás bekapcsolva."
 sprint-permission: null # null -> no permission required for sprint acceleration
 world-list-type: default # values: blacklist (default), whitelist
 world-list:
     - any_world_to_blacklist
     - example_world
+enable-by-default: true # Enable sprint acceleration by default (true) or disable by default (false)
 sprint: # delay:speedlevel
     1: 1
     2: 2
