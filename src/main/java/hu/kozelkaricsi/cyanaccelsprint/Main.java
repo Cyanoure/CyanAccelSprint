@@ -52,7 +52,7 @@ public class Main extends JavaPlugin implements Listener {
 
     public void disableSprint(Player p) {
         p.setMetadata("sprint_acceleration_enabled", new FixedMetadataValue(this, false));
-        sendTranslation(p, "message-sprint-enabled", "&eDisabled sprint acceleration.");
+        sendTranslation(p, "message-sprint-disabled", "&eDisabled sprint acceleration.");
         dbHandler.setPlayerSprintState(p.getUniqueId(), false);
     }
 
