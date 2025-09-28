@@ -59,7 +59,6 @@ public class DatabaseHandler {
             ResultSet result = stmt.executeQuery();
             if (result != null && result.next()) {
                 state = result.getBoolean(1);
-                System.out.println(state);
                 result.close();
             }
         } catch (SQLException e) {
